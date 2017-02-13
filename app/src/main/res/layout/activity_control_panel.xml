@@ -20,15 +20,6 @@
         android:layout_alignParentStart="true" />
 
     <Button
-        android:id="@+id/btnPrender"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="41dp"
-        android:text="Prender"
-        android:layout_above="@+id/btnApagar"
-        android:layout_centerHorizontal="true" />
-
-    <Button
         android:id="@+id/btnApagar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,13 +57,34 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="39dp" />
 
-    <TextView
-        android:text="TextView"
+    <Button
+        android:text="Leer Sensor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ivLed"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="39dp"
-        android:id="@+id/sLectura" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginTop="26dp"
+        android:id="@+id/btnLeer" />
+
+    <Button
+        android:id="@+id/btnPrender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Prender"
+        android:layout_above="@+id/btnApagar"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="Lectura"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sLectura"
+        android:layout_alignBaseline="@+id/btnLeer"
+        android:layout_alignBottom="@+id/btnLeer"
+        android:layout_alignRight="@+id/btnDesc"
+        android:layout_alignEnd="@+id/btnDesc" />
 
 </RelativeLayout>

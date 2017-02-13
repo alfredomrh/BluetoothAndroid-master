@@ -30,6 +30,7 @@ public class ControlPanel extends AppCompatActivity {
 
     private ImageView ivLed;
     private TextView sLectura;
+    private String readMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class ControlPanel extends AppCompatActivity {
         Button btnPrender     = (Button)findViewById(R.id.btnPrender);
         Button btnApagar      = (Button)findViewById(R.id.btnApagar);
         Button btnDesconectar = (Button)findViewById(R.id.btnDesc);
+        Button btnLeer        = (Button)findViewById(R.id.btnLeer);
 
         ivLed = (ImageView)findViewById(R.id.ivLed);
         sLectura = (TextView)findViewById(R.id.sLectura);
@@ -66,6 +68,13 @@ public class ControlPanel extends AppCompatActivity {
             }
         });
 
+        btnLeer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               leerSensor();
+            }
+        });
+
         // Configuración de la conexión Bluetooth
         String          address = getIntent().getStringExtra("address");
         BluetoothDevice device  = btAdapter.getRemoteDevice( address );
@@ -75,19 +84,42 @@ public class ControlPanel extends AppCompatActivity {
     }
 
     private void leerSensor() {
+
+        msj("Entrando a leer el sensor");
+
+        byte[] buffer = new byte[256];
+        int bytes;
+
         if (btSocket != null) {
             try {
                 //btSocket.getOutputStream().write("1".toString().getBytes());
                 InputStream is   = btSocket.getInputStream();
-                TextView sLectura = is.read( );
+                //TextView sLectura = is.read( );
+                // Keep looping to listen for received messages
+                while (true) {
+                    try {
+
+                        bytes = is.read(buffer);         //read bytes from input buffer
+                        readMessage = new String(buffer, 0, bytes);
+
+                    } catch (IOException e) {
+                        break;
+                    }
+                }
 
             } catch (IOException e) {
                 msj("Error de comunicación con Bluetooth." + e.getMessage());
             }
+
+            sLectura.setText(readMessage);
+
         }
     }
 
     private void prenderLed() {
+
+        msj("Entrando a encender el led");
+
         if (btSocket != null) {
             try {
                 btSocket.getOutputStream().write("1".toString().getBytes());
