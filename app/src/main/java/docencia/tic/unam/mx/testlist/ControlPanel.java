@@ -4,8 +4,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +30,6 @@ public class ControlPanel extends AppCompatActivity {
 
     private ImageView ivLed;
     private TextView sLectura;
-    private String readMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,31 +86,38 @@ public class ControlPanel extends AppCompatActivity {
 
         msj("Entrando a leer el sensor");
 
-        byte[] buffer = new byte[256];
-        int bytes;
+        int bufferSize = 256;
+        byte[] buffer = new byte[bufferSize];
 
         if (btSocket != null) {
+
             try {
-                //btSocket.getOutputStream().write("1".toString().getBytes());
-                InputStream is   = btSocket.getInputStream();
-                //TextView sLectura = is.read( );
-                // Keep looping to listen for received messages
+
+                InputStream instream = btSocket.getInputStream();
+                int bytesRead = -1;
+                String message = "";
+
                 while (true) {
-                    try {
 
-                        bytes = is.read(buffer);         //read bytes from input buffer
-                        readMessage = new String(buffer, 0, bytes);
+                    message = "";
+                    bytesRead = instream.read(buffer);
 
-                    } catch (IOException e) {
-                        break;
+                    if (bytesRead != -1) {
+
+                        while ((bytesRead == bufferSize) && (buffer[bufferSize - 1] != 0)) {
+                            message = message + new String(buffer, 0, bytesRead);
+                            bytesRead = instream.read(buffer);
+                        }
+
+                        message = message + new String(buffer, 0, bytesRead - 1);
+                        sLectura.setText(message); //muestra la lectura en pantalla
+                        btSocket.getInputStream();
                     }
                 }
 
-            } catch (IOException e) {
+            }catch(IOException e){
                 msj("Error de comunicación con Bluetooth." + e.getMessage());
             }
-
-            sLectura.setText(readMessage);
 
         }
     }
