@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class ControlPanel extends AppCompatActivity {
     private ConnectAsyncTask connectAsyncTask;
 
     private ImageView ivLed;
+    private TextView sLectura;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class ControlPanel extends AppCompatActivity {
         Button btnDesconectar = (Button)findViewById(R.id.btnDesc);
 
         ivLed = (ImageView)findViewById(R.id.ivLed);
+        sLectura = (TextView)findViewById(R.id.sLectura);
 
         // Configuración de los botones
         btnPrender.setOnClickListener(new View.OnClickListener() {
@@ -63,12 +66,25 @@ public class ControlPanel extends AppCompatActivity {
             }
         });
 
-        // Configuración de la conexión Bletooth
+        // Configuración de la conexión Bluetooth
         String          address = getIntent().getStringExtra("address");
         BluetoothDevice device  = btAdapter.getRemoteDevice( address );
 
         connectAsyncTask = new ConnectAsyncTask();
         connectAsyncTask.execute( device );
+    }
+
+    private void leerSensor() {
+        if (btSocket != null) {
+            try {
+                //btSocket.getOutputStream().write("1".toString().getBytes());
+                InputStream is   = btSocket.getInputStream();
+                TextView sLectura = is.read( );
+
+            } catch (IOException e) {
+                msj("Error de comunicación con Bluetooth." + e.getMessage());
+            }
+        }
     }
 
     private void prenderLed() {
@@ -116,6 +132,10 @@ public class ControlPanel extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * proceso de conexion bluetooth como cliente, primero se utiliza el metodo del devide.createInsecure...
+     * para obtener el UUID y después se llama al metodo connect del socket, asi mmSocket.connet()
+     */
     private class ConnectAsyncTask extends AsyncTask<BluetoothDevice, Integer, BluetoothSocket> {
         private BluetoothSocket mmSocket;
         private BluetoothDevice mmDevice;
@@ -125,6 +145,7 @@ public class ControlPanel extends AppCompatActivity {
             mmDevice = device[0];
 
             try {
+
                 mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(APP_UUID);
                 mmSocket.connect();
 

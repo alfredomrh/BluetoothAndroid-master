@@ -14,35 +14,62 @@ import android.widget.Toast;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-    public  static final int  REQUEST_ENABLE_BT = 1;
+
+    //constante que devuelve el valor de activacion del bluetooth
+    public static final int  REQUEST_ENABLE_BT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Se consigue el adaptador bt local del dispositivo
+
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        //si el objeto resulta null es que el disp. no tiene bluetooth
+
         if (mBluetoothAdapter == null) {
-            // Device does not support Bluetooth
-            //Toast.makeText(getApplicationContext(), "No hay capacidad de Bluetooth.", Toast.LENGTH_SHORT);
+
             msj("No hay capacidad de Bluetooth.");
-        } else {
+
+        } else { //si tiene bt, vemos si esta deshabilitado
             if (!mBluetoothAdapter.isEnabled()) {
+
+                //si lo está, lanzamos un intent para habilitarlo aunque podriamos hacerlo sin
+                //requerirselo al usuario
+
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            } else {
-                this.setupBluetooth( );
+
+            } else { //si está presente y habilitado
+
+                this.setupBluetooth( ); //llamamos al metodo de configuración
             }
         }
     }
 
+    /**
+     * metodo que recoge el resultado de la intencion que lanzamos para activar el bt
+     * si requestCode y resultCode es 1, se lanza el metodo de la configuración de bluetooth
+     * @param requestCode codigo de solicitud
+     * @param resultCode codigo resultado
+     * @param data datos de la intención
+     */
     protected void onActivityResult(int requestCode,
                                     int resultCode,
                                     Intent data) {
-        if( requestCode == REQUEST_ENABLE_BT && resultCode ==  RESULT_OK ) {
+            if( requestCode == REQUEST_ENABLE_BT && resultCode ==  RESULT_OK ) {
             this.setupBluetooth( );
         }
     }
+
+    /**
+     * Metodo que vuelve a capturar el adaptador del dispositivo y si está habilitado
+     * guarda en un array los dispositivos vinculados si los hay. Despues los muestra en un listView
+     * y si haces click sobre alguno de ellos, lanza la activity ControlPanel, pasandole la
+     * mac del dispositivo seleccionado.
+     */
 
     private void setupBluetooth( ) {
         final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -58,8 +85,11 @@ public class MainActivity extends AppCompatActivity {
                 for (BluetoothDevice device : pairedDevices) {
                     devices[ i++ ] = device;
                 }
+
                 final ListView listview = (ListView) findViewById(R.id.listview);
+
                 listview.setAdapter( new MyBluetoothAdapter(getApplicationContext(), devices ) );
+
                 listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -77,6 +107,11 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+    /**
+     * metodo para sacar un mensaje en pantalla
+     * @param mensaje
+     */
 
     public void msj(String mensaje) {
         try {
