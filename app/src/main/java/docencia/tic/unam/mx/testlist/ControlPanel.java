@@ -111,7 +111,7 @@ public class ControlPanel extends AppCompatActivity {
 
                         message = message + new String(buffer, 0, bytesRead - 1);
                         sLectura.setText(message); //muestra la lectura en pantalla
-                        btSocket.getInputStream();
+
                     }
                 }
 
